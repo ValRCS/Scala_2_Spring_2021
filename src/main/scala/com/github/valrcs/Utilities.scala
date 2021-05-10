@@ -2,6 +2,8 @@ package com.github.valrcs
 
 
 
+import java.io.File
+
 import scala.io.{Codec, Source}
 
 
@@ -120,4 +122,14 @@ object Utilities {
   }
 
   def myMax(values: Seq[Int]):Int = values.max
+
+  //https://alvinalexander.com/scala/how-to-list-files-in-directory-filter-names-scala/ idea
+  def getFileNames(folder:String, prefix:String="", suffix:String =".txt"): Array[String] = {
+    val d = new File(folder)
+    if (d.exists && d.isDirectory) {
+      d.listFiles.filter(_.isFile).map(_.toString).filter(_.startsWith(prefix)).filter(_.endsWith(suffix))
+    } else {
+      Array[String]()
+    }
+  }
 }
