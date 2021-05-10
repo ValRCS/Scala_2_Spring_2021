@@ -124,6 +124,7 @@ object Utilities {
   def myMax(values: Seq[Int]):Int = values.max
 
   //https://alvinalexander.com/scala/how-to-list-files-in-directory-filter-names-scala/ idea
+  //TODO add regex, contains etc capability
   def getFileNames(folder:String, prefix:String="", suffix:String =".txt"): Array[String] = {
     val d = new File(folder)
     if (d.exists && d.isDirectory) {

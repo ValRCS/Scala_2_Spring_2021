@@ -7,12 +7,14 @@ object SparseArrays extends App {
   //TODO read and parse ../resources/arr2.txt
 //  val filePath1 = "./src/resources/arr1.txt" //these we could read from argparse as well
 //  val filePath2 = "./src/resources/arr2.txt"
-  val folderName = "./src/resources/arr"
+  val folderName = "./src/resources"
 
   def getFilePaths(beg: Int, end:Int, prefix: String="./src/resources/arr", suffix: String=".txt"):Array[String] = {
     (beg to end).map(num => s"$prefix$num$suffix").toArray //remember to INCLUDES the end value, until DOES NOT
   }
-  val filePaths = getFilePaths(1,3) //this will get us file names which are similar just differ by some number in middle
+//  val filePaths = getFilePaths(1,3) //this will get us file names which are similar just differ by some number in middle
+//FIXME  val filePaths = Utilities.getFileNames(folderName, prefix = "arr", suffix = "txt") //it is already default .txt which is fine
+  val filePaths = Utilities.getFileNames(folderName, suffix = "txt") //it is already default .txt which is fine
   filePaths.foreach(println)
   //in fact i could create the above file paths programmatically with a loop, if I had many similar files to process
   //return (println) the results
