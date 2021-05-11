@@ -3,6 +3,8 @@ object Crush extends App {
   //https://www.hackerrank.com/challenges/crush/problem
   //TODO read and parse ../resources/crush1.txt
   //TODO read and parse ../resources/crush2.txt
+  //TODO read and parse ../resources/crush3.txt
+  //TODO read and parse ../resources/crush4.txt
   //you need to perform 3 operations
   //and find the maximum in the new array
 
