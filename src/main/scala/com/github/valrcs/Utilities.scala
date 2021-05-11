@@ -128,7 +128,11 @@ object Utilities {
   def getFileNames(folder:String, prefix:String="", suffix:String =".txt"): Array[String] = {
     val d = new File(folder)
     if (d.exists && d.isDirectory) {
-      d.listFiles.filter(_.isFile).map(_.toString).filter(_.startsWith(prefix)).filter(_.endsWith(suffix))
+      d.listFiles
+        .filter(_.isFile)
+        .map(_.toString)
+        .filter(_.split("\\\\").last.startsWith(prefix)) //windows specific escaping for file paths \\
+        .filter(_.endsWith(suffix))
     } else {
       Array[String]()
     }

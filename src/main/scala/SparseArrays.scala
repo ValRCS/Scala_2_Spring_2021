@@ -9,12 +9,14 @@ object SparseArrays extends App {
 //  val filePath2 = "./src/resources/arr2.txt"
   val folderName = "./src/resources"
 
+  //this is a way to generate some strings with some number in middle
   def getFilePaths(beg: Int, end:Int, prefix: String="./src/resources/arr", suffix: String=".txt"):Array[String] = {
     (beg to end).map(num => s"$prefix$num$suffix").toArray //remember to INCLUDES the end value, until DOES NOT
   }
 //  val filePaths = getFilePaths(1,3) //this will get us file names which are similar just differ by some number in middle
 //FIXME  val filePaths = Utilities.getFileNames(folderName, prefix = "arr", suffix = "txt") //it is already default .txt which is fine
-  val filePaths = Utilities.getFileNames(folderName, suffix = "txt") //it is already default .txt which is fine
+//  val filePaths = Utilities.getFileNames(folderName, suffix = "xt") //it is already default .txt which is fine
+  val filePaths = Utilities.getFileNames(folderName, prefix="ar", suffix = "xt")
   filePaths.foreach(println)
   //in fact i could create the above file paths programmatically with a loop, if I had many similar files to process
   //return (println) the results
