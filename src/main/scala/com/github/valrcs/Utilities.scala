@@ -74,7 +74,7 @@ object Utilities {
     pw.close()
   }
 
-  def saveLines(lines: Array[String], destPath: String, sep: String = "\n"): Unit = {
+  def saveLines(lines: Seq[String], destPath: String, sep: String = "\n"): Unit = {
     val txt = lines.mkString(sep)
 
     import java.io.{File, PrintWriter} //explicit import
