@@ -1,5 +1,9 @@
 package com.github.valrcs
 
+import com.github.valrcs.Maps.testSize
+
+import scala.collection.immutable
+import scala.collection.mutable.HashMap
 import scala.util.Random
 
 object Maps extends App {
@@ -21,6 +25,32 @@ object Maps extends App {
     (0 until testSize).map(n => n.toString -> Random.nextInt(testSize)).toMap
   }
 
+  //TODO see if we can generate a Java HashMap on the fly
+//  def genImmutableHashMap(testSize:Int = testSize):immutable.HashMap[String,Int] = {
+//    val myMap = (0 until testSize).map(n => n.toString -> Random.nextInt(testSize)).toMap
+//    val hashMap = new immutable.HashMap[String,Int](myMap)
+//    hashMap
+//  }
+
+  def genHashMap(testSize:Int = testSize):HashMap[String,Int] = {
+//    (0 until testSize).map(n => n.toString -> Random.nextInt(testSize)).toMap.asInstanceOf[HashMap]
+    val myHashMap = HashMap[String,Int]()
+    for (n <- 0 until testSize) {
+      myHashMap += (n.toString -> Random.nextInt(testSize)) //this should be slower than our genMap map creation
+    }
+    myHashMap
+  }
+
+  def measureHashMap(genMap: HashMap[String,Int]):Long = {
+    val t0 = System.nanoTime()
+    //    val sum = genMap.map(it => it._2).sum
+    val sum = genMap.values.sum //we gain about 30% speed increase by going to values instead of using map
+    val t1 = System.nanoTime()
+    val delta = t1 - t0
+    //    println(s"Nanoseconds expired: $delta")
+    delta
+  }
+
   def measureMap(genMap: Map[String,Int]):Long = {
     val t0 = System.nanoTime()
 //    val sum = genMap.map(it => it._2).sum
@@ -30,7 +60,9 @@ object Maps extends App {
 //    println(s"Nanoseconds expired: $delta")
     delta
   }
-  val genMapTime = (0 until numTests).map(n => measureMap(genMap())).sum
+  val genMapTime = (0 until numTests).map(_ => measureMap(genMap())).sum
   println(s"$numTests tests took $genMapTime nanoseconds")
+  val genHashMapTime = (0 until numTests).map(_ => measureHashMap(genHashMap())).sum
+  println(s"$numTests tests took $genHashMapTime nanoseconds")
 
 }
