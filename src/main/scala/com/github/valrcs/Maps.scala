@@ -6,9 +6,9 @@ import scala.collection.immutable
 import scala.collection.mutable.HashMap
 import scala.util.Random
 
-object Maps extends App {
+object Maps extends App{
   println("Testing Map type performance")
-  val testSize = 15
+  val testSize = 1000
   val numTests = 100
   val myMap = Map("A"-> 1, "B" -> 2,"C"->1, "A"-> 2) //so during construction the last key - value pair wins
   println(myMap("A"))
