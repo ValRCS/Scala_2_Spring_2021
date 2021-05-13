@@ -97,4 +97,8 @@ object MapExercise extends App {
   resultsBuf += (0 until testSize).map(_ => testBigFunSpeed(fullReverse, mapSize)).sum
   //we could finalize the buffer and convert to Sequence type or Vector here
   resultsBuf.zipWithIndex.foreach(t => println(s"Speed for result No. ${t._1} is ${t._2}"))
+
+  //groupBy improvements
+  // https://stackoverflow.com/questions/2338282/elegant-way-to-invert-a-map-in-scala
+  //https://stackoverflow.com/questions/52232058/scala-reverse-a-map-and-new-value-is-a-list-for-duplicated-key?noredirect=1&lq=1
 }
