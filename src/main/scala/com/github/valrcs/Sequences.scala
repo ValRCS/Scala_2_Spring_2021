@@ -2,7 +2,7 @@ package com.github.valrcs
 
 import scala.util.Random
 
-object Collections extends App {
+object Sequences extends App {
   val testSize = 1000
   val numTests = 100
 
