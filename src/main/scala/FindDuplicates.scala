@@ -9,4 +9,7 @@ object FindFrequency extends App {
   //1 3
   //4 1
   //9 6 times etc
+
+  //HINTS we can use Map
+  //Also groupBy might help
 }
