@@ -57,4 +57,23 @@ object FindFrequency extends App {
   def intNumbers = numbers.map(_.toInt)
   val counter = countNumbers(intNumbers, 1000)
   counter.slice(0, 20).foreach(println)
+//  val counterMap = (counter zipWithIndex).toMap
+  val counterMapZip = counter.zipWithIndex.toMap //same as above
+  counterMapZip.toSeq.slice(0,10).foreach(println)
+
+  //general counter would be create a Map and just count things there
+
+
+  def countAnything(seq:Seq[Any]):Map[Any,Int] = {
+    val counterMap = scala.collection.mutable.Map[Any, Int]()
+    for (it <- seq) {
+      if (counterMap contains it) counterMap(it) += 1
+      else counterMap(it) = 1
+    }
+    counterMap.toMap //we return immutable 99% of time
+  }
+  val genericCount = countAnything(Seq("Dog",1,3,6,"Valdis", "dog","cat","dog",3))
+  println(genericCount)
+  val genericNumberCount = countAnything(numbers)
+  genericNumberCount.toSeq.slice(0,10).foreach(println)
 }
