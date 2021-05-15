@@ -1,5 +1,7 @@
 package com.github.valrcs
 
+import com.github.valrcs.AnimalEnum.AnimalEnum
+
 object ScalaExercises extends App {
   val myMap = Map("MI" -> "Michigan", "OH" -> "Ohio", "WI" -> "Wisconsin", "MI" -> "Michigan")
   val aNewMap = myMap + ("IL" -> "Illinois") //memory wise for big maps you would want to use mutable map
@@ -60,6 +62,54 @@ object ScalaExercises extends App {
   val bList = aList.filterNot(v => v == 5)
   println(bList)
   //TODO write a filter which is same as filterNot above
-  val cList = aList.filter(n => true)
+  val cList = aList.filter(n => n != 5) //prefer filter usually
+  println(cList)
   println(bList == cList) //should be true
+
+  //https://www.scala-exercises.org/std_lib/objects
+  val clark = new Person("Clark Kent", "Superman")
+  val peter = new Person("Peter Parker", "Spider-Man")
+
+  println(Person.showMeInnerSecret(clark))
+  println(Person.showMeInnerSecret(peter))
+  println(clark.showMeInnerSecretFromObject())
+  println(peter.showMeInnerSecretFromObject())
+
+  val doggie = Animal("dog", "Fido")
+  val kitty = Animal("cat", "Muris")
+  println(doggie, doggie.aType, doggie.name)
+  println(kitty, kitty.aType, kitty.name)
+
+  val strictDog = StrictAnimal(AnimalEnum.DOG, "Dzulbars")
+  val strictCat = StrictAnimal(AnimalEnum.CAT, "Tom")
+  println(strictDog)
+  println(strictCat)
+}
+
+class Person(
+              val name: String,
+              private val superheroName: String) {//The superhero name is private! {
+  def showMeInnerSecretFromObject() = s"My secret is $superheroName"
+}
+
+//companion object to some class so it gets access to private properties and methos of those class members
+object Person {
+  def showMeInnerSecret(x: Person) = x.superheroName
+}
+
+
+class Investigator()
+
+object Investigator {
+  def showMeInnerSecret(x: Person) = "sorry no x.superheroName" //other classes do not get access to private properties only companion object
+}
+
+case class Animal(aType: String, name:String)
+
+case class StrictAnimal(aType: AnimalEnum, name:String)
+
+//remember in Scala 3 we will have the new enum syntax
+object AnimalEnum extends Enumeration {
+  type AnimalEnum = Value
+  val CAT, DOG, MOUSE = Value
 }
