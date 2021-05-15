@@ -69,6 +69,16 @@ object MapExercise extends App {
 //    Map(42 -> Seq("foo","bar"))
     resultMap
   }
+
+  def fullReverse2(map:Map[String,Int]):Map[Int, scala.collection.immutable.Iterable[String]] = {
+//    map.groupMap(_._2)(_._1)
+    map.groupBy(_._2).mapValues(_.map(_._1)).toMap //kind of slower than rullReverse1 or 3
+  }
+
+  def fullReverse3(map:Map[String,Int]):Map[Int, scala.collection.immutable.Iterable[String]] = {
+        map.groupMap(_._2)(_._1)
+  }
+
   val tenMap = genMap(10)
   val reversedTenMap = fullReverse(tenMap)
   tenMap.foreach(println)
@@ -80,7 +90,7 @@ object MapExercise extends App {
   bigMap.toSeq.slice(0,10).foreach(println)
   reversedBigMap.toSeq.slice(0,10).foreach(println)
 
-  def testBigFunSpeed(myFun: Map[String,Int] => Map[Int,Seq[String]], mapSize:Int = 20):Long ={
+  def testBigFunSpeed(myFun: Map[String,Int] => Map[Int,Iterable[String]], mapSize:Int = 20):Long ={
     val tMap = genMap(mapSize)
     val t0 = System.nanoTime()
     val reversedMap = myFun(tMap) //so we can the function we passed in and use it
@@ -95,8 +105,11 @@ object MapExercise extends App {
   resultsBuf += (0 until testSize).map(_ => testFunSpeed(reverseMap2, mapSize)).sum
   resultsBuf += (0 until testSize).map(_ => testFunSpeed(reverseMap3, mapSize)).sum
   resultsBuf += (0 until testSize).map(_ => testBigFunSpeed(fullReverse, mapSize)).sum
+  resultsBuf += (0 until testSize).map(_ => testBigFunSpeed(fullReverse2, mapSize)).sum
+  resultsBuf += (0 until testSize).map(_ => testBigFunSpeed(fullReverse3, mapSize)).sum
   //we could finalize the buffer and convert to Sequence type or Vector here
   resultsBuf.zipWithIndex.foreach(t => println(s"Speed for result No. ${t._1} is ${t._2}"))
+  resultsBuf.zipWithIndex.foreach(t => println(s"Speed for result No. ${t._2} is ${t._1}"))
 
   //groupBy improvements
   // https://stackoverflow.com/questions/2338282/elegant-way-to-invert-a-map-in-scala
