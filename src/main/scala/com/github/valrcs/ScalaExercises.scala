@@ -84,6 +84,8 @@ object ScalaExercises extends App {
   val strictCat = StrictAnimal(AnimalEnum.CAT, "Tom")
   println(strictDog)
   println(strictCat)
+  //ids for enums are created automatically unless you need specific id numbering
+  println(AnimalEnum.CAT.id, AnimalEnum.DOG.id, AnimalEnum.MOUSE.id)
 }
 
 class Person(
