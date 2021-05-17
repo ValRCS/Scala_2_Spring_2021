@@ -1,0 +1,59 @@
+-- https://mystery.knightlab.com/
+
+--SELECT * FROM crime_scene_report csr2
+--WHERE type = 'murder'
+--AND city = 'SQL City'
+--AND date = 20180115; --not a great practice for date to be an integer
+Security footage shows that there were 2 witnesses. The first witness lives at the last house on "Northwestern Dr".
+The second witness, named Annabel, lives somewhere on "Franklin Ave".
+
+SELECT * FROM person p
+WHERE address_street_name LIKE "Northwestern Dr%"
+ORDER BY address_number DESC
+LIMIT 1;
+
+
+CREATE TABLE person (
+        id integer PRIMARY KEY,
+        name text,
+        license_id integer,
+        address_number integer,
+        address_street_name text,
+        ssn integer,
+        FOREIGN KEY (license_id) REFERENCES drivers_license(id)
+    )
+
+14887	Morty Schapiro	118009	4919	Northwestern Dr	111564949
+
+SELECT * FROM person p
+WHERE address_street_name LIKE "Franklin%"
+AND name LIKE "Annabel%";
+
+16371	Annabel Miller	490173	103	Franklin Ave	318771143
+
+SELECT * FROM interview i
+WHERE person_id = (
+	SELECT id FROM person p
+	WHERE address_street_name LIKE "Northwestern Dr%"
+	ORDER BY address_number DESC
+	LIMIT 1);
+14887	I heard a gunshot and then saw a man run out. He had a "Get Fit Now Gym" bag.
+The membership number on the bag started with "48Z".
+Only gold members have those bags.
+The man got into a car with a plate that included "H42W".
+
+SELECT * FROM interview i2
+WHERE person_id = (SELECT id FROM person p
+WHERE address_street_name LIKE "Franklin%"
+AND name LIKE "Annabel%");
+16371	I saw the murder happen, and I recognized the killer from my gym when I was working out last week on January the 9th.
+
+SELECT * FROM get_fit_now_member gfnm
+WHERE id LIKE "48Z%"
+AND
+membership_status = 'gold';
+
+48Z7A	28819	Joe Germuska	20160305	gold
+48Z55	67318	Jeremy Bowers	20160101	gold
+
+//TODO find the suspect (looks like we have 2)
