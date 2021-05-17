@@ -57,3 +57,86 @@ membership_status = 'gold';
 48Z55	67318	Jeremy Bowers	20160101	gold
 
 //TODO find the suspect (looks like we have 2)
+
+SELECT * FROM get_fit_now_check_in gfnci
+JOIN get_fit_now_member gfnm
+ON gfnci.membership_id = gfnm.id
+JOIN person p2
+ON gfnm.person_id = p2.id
+LEFT JOIN income i2
+ON p2.ssn = i2.ssn
+LEFT JOIN drivers_license dl
+ON p2.license_id = dl.id
+WHERE check_in_date = 20180109
+AND membership_id in (SELECT id FROM get_fit_now_member gfnm
+WHERE id LIKE "48Z%"
+AND
+membership_status = 'gold');
+
+48Z7A	20180109	1600	1730	48Z7A	28819	Joe Germuska	20160305	gold	28819	Joe Germuska	173289	111	Fisk Rd	138909730
+48Z55	20180109	1530	1700	48Z55	67318	Jeremy Bowers	20160101	gold	67318	Jeremy Bowers	423327	530	Washington Pl, Apt 3A	871539279	871539279	10500	423327	30	70	brown	brown	male	0H42W2	Chevrolet	Spark LS
+
+Joe does not drive and has no official income, Jeremy drives but has little income
+
+SELECT * FROM interview i
+WHERE i.person_id in (28819,67318);
+
+67318	I was hired by a woman with a lot of money.
+I don't know her name but I know she's around 5'5" (65") or 5'7" (67").
+She has red hair and she drives a Tesla Model S.
+I know that she attended the SQL Symphony Concert 3 times in December 2017.
+
+SELECT * FROM drivers_license dl
+WHERE
+(height BETWEEN 65 AND 67)
+AND car_make = 'Tesla'
+AND gender = 'female'
+AND hair_color = 'red'
+and car_model = 'Model S';
+
+Gives us 3 possible suspects
+
+202298	68	66	green	red	female	500123	Tesla	Model S
+291182	65	66	blue	red	female	08CM64	Tesla	Model S
+918773	48	65	black	red	female	917UU3	Tesla	Model S
+
+
+SELECT * FROM drivers_license dl
+JOIN person p2
+ON p2.license_id = dl.id
+LEFT JOIN income i2
+ON p2.ssn = i2.ssn
+WHERE
+(height BETWEEN 65 AND 67)
+AND car_make = 'Tesla'
+AND gender = 'female'
+AND hair_color = 'red'
+and car_model = 'Model S';
+
+918773	48	65	black	red	female	917UU3	Tesla	Model S	78881	Red Korb	918773	107	Camerata Dr	961388910	961388910	278000
+291182	65	66	blue	red	female	08CM64	Tesla	Model S	90700	Regina George	291182	332	Maple Ave	337169072
+202298	68	66	green	red	female	500123	Tesla	Model S	99716	Miranda Priestly	202298	1883	Golden Ave	987756388	987756388	310000
+
+SELECT name FROM drivers_license dl
+JOIN person p2
+ON p2.license_id = dl.id
+LEFT JOIN income i2
+ON p2.ssn = i2.ssn
+WHERE
+(height BETWEEN 65 AND 67)
+AND car_make = 'Tesla'
+AND gender = 'female'
+AND hair_color = 'red'
+and car_model = 'Model S'
+AND p2.id IN
+(SELECT person_id
+FROM
+(SELECT person_id, COUNT(person_id) as visits FROM facebook_event_checkin fec
+WHERE event_name LIKE "SQL Symphony Concert"
+AND date > 20171130
+AND date < 20180101
+GROUP BY person_id
+HAVING visits = 3
+ORDER BY visits DESC));
+
+Miranda Priestly
