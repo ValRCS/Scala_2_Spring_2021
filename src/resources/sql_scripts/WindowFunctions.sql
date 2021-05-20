@@ -82,13 +82,34 @@
 --ORDER BY c.Country) percRank
 --FROM customers c;
 
-SELECT
-    AlbumId,
-    Name,
-    Bytes,
-    printf('%.2f',PERCENT_RANK() OVER(
-        PARTITION BY AlbumId
-        ORDER BY Bytes
-    )) SizePercentRank
-FROM
-    tracks;
+--SELECT
+--    AlbumId,
+--    Name,
+--    Bytes,
+--    printf('%.2f',PERCENT_RANK() OVER(
+--        PARTITION BY AlbumId
+--        ORDER BY Bytes
+--    )) SizePercentRank
+--FROM
+--    tracks;
+
+--SELECT
+--    Name,
+--    printf('%,d',Bytes) Size,
+--    FIRST_VALUE(Name) OVER (
+--        ORDER BY Bytes
+--    ) AS SmallestTrack
+--FROM
+--    tracks
+--WHERE
+--    AlbumId = 1;
+
+SELECT AlbumId, Name, printf('%,d',Bytes) Size,
+FIRST_VALUE(Name) OVER (
+	PARTITION BY AlbumId
+	ORDER BY Bytes DESC) BiggieTrack,
+LAST_VALUE(Name) OVER (
+	PARTITION BY AlbumId
+	ORDER BY Bytes DESC) MiniTrack
+FROM tracks t
+ORDER BY Name DESC;
