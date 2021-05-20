@@ -217,3 +217,205 @@
 -- number of songs in the album
 -- and for extra kicks album real name and also artist
 
+
+--CREATE VIEW v_RankedTracks
+--AS
+--SELECT t.AlbumId , a.Title AlbumName, a2.Name ArtistName, t.Name SongName, t.Milliseconds,
+--AVG(t.Milliseconds) OVER (
+--			PARTITION BY t.AlbumId
+--			ORDER BY t.Milliseconds ASC) AverageLength,
+--RANK () OVER (
+--		PARTITION BY t.AlbumId
+--		ORDER BY t.Milliseconds ASC) LengthRank,
+--FIRST_VALUE(t.Name) OVER (
+--			PARTITION BY t.AlbumId) FirstTrack,
+--COUNT(t.TrackId) OVER (
+--			PARTITION BY t.AlbumId ) NumberOfSongs
+--FROM tracks t
+--JOIN albums a
+--ON a.AlbumId = t.AlbumId
+--JOIN artists a2
+--ON a.AlbumId = a2.ArtistId ;
+--
+--SELECT * from v_RankedTracks ;
+
+
+--SELECT *,
+--SUM(Total) OVER (
+--	PARTITION BY CustomerId
+--	ORDER BY Year
+--) CumulativeTotal,
+--COUNT(Total)  OVER (
+--PARTITION BY CustomerId
+--ORDER BY Year
+--) YearsOfSales,
+--AVG(Total)  OVER (
+--PARTITION BY CustomerId
+--ORDER BY Year
+--) AverageSales,
+--MIN(Total)  OVER (
+--PARTITION BY CustomerId
+--ORDER BY Year
+--) CurMin,
+--MAX(Total)  OVER (
+--PARTITION BY CustomerId
+--ORDER BY Year
+--) CurMax
+--FROM v_CustomerInvoices vci ;
+
+--SELECT AlbumName, ArtistName ,
+--COUNT(SongName) SongCount,
+--GROUP_CONCAT(SongName, ';') AllTracks,
+--SUM(Milliseconds) AlbumLength
+--FROM v_RankedTracks
+--GROUP BY AlbumId ;
+
+--GROUP_CONCAT does not work as a windows function
+--SELECT *, GROUP_CONCAT(SongName) OVER (
+--	PARTITION BY AlbumId,
+--	ORDER BY Milliseconds
+--) GrpConcat
+--FROM v_RankedTracks vrt ;
+
+--Not very useful without GROUP BY
+--SELECT *, GROUP_CONCAT(SongName, ';')
+--FROM v_RankedTracks vrt
+--LIMIT 15;
+
+SELECT customerid,
+       firstname,
+       lastname,
+       country,
+       CASE country
+           WHEN 'USA'
+               THEN 'Domestic'
+           ELSE 'Foreign'
+       END CustomerGroup
+FROM
+    customers
+ORDER BY
+    LastName,
+    FirstName;
+
+SELECT firstname,
+       lastname,
+       phone,
+       fax,
+       IFNULL(fax, 'Zero') foxxy
+  FROM customers
+ ORDER BY firstname;
+
+--We can check for NUll values
+SELECT LastName,
+fax,
+CASE
+WHEN fax IS NULL
+	THEN 0
+	ELSE 1
+END HasFax
+FROM customers c
+ORDER BY LastName;
+
+SELECT *,
+CASE WHEN Total > 12
+	THEN 'BigSpender'
+	ELSE 'CouldImprove'
+END SpendCategory
+FROM v_CustomerInvoices vci ;
+
+--Now if we have 3 paths to take we use the following
+SELECT
+	trackid,
+	name,
+	milliseconds,
+	CASE
+		WHEN milliseconds < 60000 THEN
+			'short'
+		WHEN milliseconds > 60000 AND milliseconds < 300000 THEN 'medium'
+		ELSE
+			'long'
+		END category
+FROM
+	tracks
+ORDER BY category DESC;
+
+EXPLAIN QUERY PLAN
+SELECT * FROM customers
+WHERE Email LIKE '%gmail.com';
+
+SELECT * FROM customers
+WHERE Email LIKE '%gmail.com';
+
+EXPLAIN QUERY PLAN
+SELECT *
+FROM customers c
+WHERE country = 'USA';
+
+--if we need to look up email often we might get better performance by creating a specific index
+--index
+CREATE UNIQUE INDEX idx_customers_email
+ON customers (email);
+
+EXPLAIN QUERY PLAN
+SELECT * FROM customers
+WHERE Email LIKE '%gmail.com';
+
+--So for LIKe the index does not help
+EXPLAIN QUERY PLAN
+SELECT * FROM customers
+WHERE Email LIKE 'valdis.saulespurens@gmail.com';
+
+--So for strict equality it will help
+EXPLAIN QUERY PLAN
+SELECT * FROM customers
+WHERE Email = 'valdis.saulespurens@gmail.com';
+
+SELECT
+	trackid,
+	name
+FROM
+	tracks
+WHERE
+	name GLOB 'Man*';
+
+SELECT
+	trackid,
+	name
+FROM
+	tracks
+WHERE
+	name GLOB '*Woman*';
+
+--so get all the songs that start with A,B,C with second letter being aeu
+SELECT
+	trackid,
+	name
+FROM tracks t2
+WHERE name GLOB '[A-C][aeu]*'
+
+--so get all the 4 letter songs
+SELECT
+	trackid,
+	name
+FROM tracks t2
+WHERE name GLOB '????';
+
+-- so songs which have a single number 1 to 9 somewhere in the song
+SELECT
+	trackid,
+	name
+FROM
+	tracks
+WHERE
+	name GLOB '*[1-9]*';
+
+--Or to find the tracks whose name does not contain any number,
+-- you place the character ^ at the beginning of the list:
+
+SELECT
+	trackid,
+	name
+FROM
+	tracks
+WHERE
+	name GLOB '*[^1-9]*';
