@@ -28,9 +28,9 @@ object MongoDBJSON extends App {
   val collection = db.getCollection(collectionName)
 
 
-  collection.insertOne(JSON(jsonStringsTrim(0))).subscribe(res => println(res),
-          (e: Throwable) => println(s"There was an error when inserting data: $e"),
-          () => println("Completed insertion or not!"))
+//  collection.insertOne(JSON(jsonStringsTrim(0))).subscribe(res => println(res),
+//          (e: Throwable) => println(s"There was an error when inserting data: $e"),
+//          () => println("Completed insertion or not!"))
   sleep(1000)
   client.close()
 }
