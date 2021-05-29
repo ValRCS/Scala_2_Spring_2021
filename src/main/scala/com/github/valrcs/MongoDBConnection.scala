@@ -9,8 +9,9 @@ import java.lang.Thread.sleep
 import scala.collection.mutable.ArrayBuffer
 
 case class Restaurant(name: String,
+                      cuisine: String,
                       borough: String, street:String, building:String, zipcode:String,
-                      longitude:Long, latitude:Long,
+                      longitude:Double, latitude:Double,
                       curGrade:String,
                       curScore:Int)
 
@@ -60,25 +61,40 @@ object MongoDBConnection extends App {
 //  val chinese = collection.find(and(equal("cuisine", "Chinese"),equal("borough","Brooklyn")))//so this example of
 
   //TODO convert single document into Restaurant case class
-//    def docToRestaurant(doc:Document) :Restaurant = {
-//      val name: String = doc.
-//      val borough: String
-//      val street:String
-//      val building:String
-//      val zipcode:String
-//      val longitude:Long
-//      val latitude:Long
-//      val curGrade:String,
-//      val curScore:Int
-//    }
+    def docToRestaurant(doc:Document) :Restaurant = {
+      //TODO add more values
+      val name = doc.getOrElse("name","NoNameRestaurant").asString().getValue()
+      val cuisine = doc.getOrElse("cuisine","noCuisine").asString().getValue()
+      val borough = doc.getOrElse("borough","noBorough").asString().getValue()
+      //default for street should be blank document, but since string is valid json this still works
+      val street = doc.getOrElse(key = "address", "nothing")
+        .asDocument().getOrElse(key="street", "noStreet")
+        .asString().getValue()
+      val building = ""
+      val zipcode = ""
+      //of course there is a possibility of index not existing in get(0)
+      val longitude = doc.getOrElse(key = "address", "nothing")
+        .asDocument()
+        .getOrElse("coord",Seq(0.0,0.0))
+        .asArray().get(0)
+        .asDouble() //mongoDb library methods
+        .doubleValue() //this is the Scala approach the last 2
+      val latitude = 0L
+      val curGrade = "FF"
+      val curScore = 0
+      Restaurant(name, cuisine, borough, street, building, zipcode, longitude, latitude, curGrade, curScore)
+    }
 
 //  brooklyn_chinese.foreach(println)
     sleep(2000) //so sleep for 5 seconds
     println(arrBuffer.size)
 
+    val restaurants = arrBuffer.map(doc => docToRestaurant(doc)).toSeq
+    restaurants.slice(0,5).foreach(println)
+
     val jsonLines = arrBuffer.map(doc => doc.toJson()).toSeq
     val jsonString = "[\n" + jsonLines.mkString(",\n") + "\n]" //quick and dirty solution to our json formattting proble
-    Utilities.saveString(jsonString, "./src/resources/restaurants.json")
+//    Utilities.saveString(jsonString, "./src/resources/restaurants.json") //this works fine
 //    Utilities.saveLines(jsonLines, "./src/resources/restaurants.json", sep =",\n")
   client.close()
 }
