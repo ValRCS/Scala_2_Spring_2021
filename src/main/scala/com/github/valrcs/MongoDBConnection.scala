@@ -32,7 +32,7 @@ object MongoDBConnection extends App {
   val db: MongoDatabase = client.getDatabase(dbname)
   val collection = db.getCollection(collectionName)
   //this is a command it does return an observable if you want to monitor creation
- // db.createCollection("good_restaurants") //TODO why creation is not working, we have to do it manually in MongoDB atlas cloud
+  db.createCollection("from_text_restaurants") //TODO why creation is not working, we have to do it manually in MongoDB atlas cloud
 
   //https://mongodb.github.io/mongo-scala-driver/1.0/reference/observables/
 //  collection.find(equal("name", "456 Cookies Shop")).subscribe((doc: Document) => println(doc.toJson()),
@@ -87,17 +87,34 @@ object MongoDBConnection extends App {
       val street = doc.getOrElse(key = "address", "nothing")
         .asDocument().getOrElse(key="street", "noStreet")
         .asString().getValue()
-      val building = ""//TODO
-      val zipcode = ""//TODO
+      val building = doc.getOrElse(key = "address", "nothing")
+        .asDocument().getOrElse(key="building", "nothing")
+        .asString() //this is still BSON we need to get Value to get String
+        .getValue()
+      val zipcode = doc.getOrElse(key="address", "nothing")
+      .asDocument().getOrElse(key="zipcode", "nothing")
+      .asString()
+      .getValue()
       //of course there is a possibility of index not existing in get(0)
+      val latitude = doc.getOrElse(key = "address", "nothing")
+        .asDocument()
+        .getOrElse("coord", Seq(0.0, 0.0))
+        .asArray().get(0)
+        .asDouble()
+        .doubleValue()
       val longitude = doc.getOrElse(key = "address", "nothing")
         .asDocument()
         .getOrElse("coord",Seq(0.0,0.0))
-        .asArray().get(0)
+        .asArray().get(1)
         .asDouble() //mongoDb library methods
         .doubleValue() //this is the Scala approach the last 2
-      val latitude = 0L //TODO
-      val curGrade = "FF" //TODO
+
+      val curGrade = doc.getOrElse("grades", Seq(0,0))
+        .asArray()
+        .get(0).asDocument()
+        .getOrElse("grade", "nothing")
+        .asString()
+        .getValue()
       val curScore = doc.getOrElse("grades",Seq(0,0))
         .asArray().get(0).asDocument()
         .getOrElse("score", -2)
@@ -111,7 +128,7 @@ object MongoDBConnection extends App {
     Document("name" -> restaurant.name ,
       "borough" -> restaurant.borough,
       "address" -> Document("phone" -> "228-555-0149",
-        "email" -> "cafeconleche@example.com",
+        "email" -> "cafeconleche@example.com",//TODO change it to real email if you have one
         "location" -> Seq(restaurant.latitude, restaurant.longitude)),
       "latestGrade" -> restaurant.curGrade,
       "latestScore" -> restaurant.curScore,
