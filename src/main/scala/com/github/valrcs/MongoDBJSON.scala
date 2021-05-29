@@ -1,6 +1,7 @@
 package com.github.valrcs
 
-import org.mongodb.scala.{MongoClient, MongoDatabase}
+import org.bson.BSONEncoder
+import org.mongodb.scala.{Document, MongoClient, MongoDatabase}
 
 import java.lang.Thread.sleep
 
@@ -27,10 +28,20 @@ object MongoDBJSON extends App {
   val db: MongoDatabase = client.getDatabase(dbname)
   val collection = db.getCollection(collectionName)
 
+  val doc: Document = org.bson.Document.parse(jsonStringsTrim.head).toBsonDocument
+  println(doc)
+  def txtToDoc(txt: String):Document = org.bson.Document.parse(txt).toBsonDocument
 
-//  collection.insertOne(JSON(jsonStringsTrim(0))).subscribe(res => println(res),
+//  collection.insertOne(doc).subscribe(res => println(res),
 //          (e: Throwable) => println(s"There was an error when inserting data: $e"),
 //          () => println("Completed insertion or not!"))
+  //tail because we already inserted first element above
+  val docs = jsonStringsTrim.tail.map(txtToDoc) //same as .map(it => txtToDoc(it))
+
+      collection.insertMany(docs).subscribe(res => println(res),
+        (e: Throwable) => println(s"There was an error when inserting tons of data: $e"),
+        () => println("Completed insertion!"))
+
   sleep(1000)
   client.close()
 }
