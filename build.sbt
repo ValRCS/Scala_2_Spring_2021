@@ -9,3 +9,10 @@ libraryDependencies ++= Seq(
 )
 
 libraryDependencies += "org.mongodb.scala" %% "mongo-scala-driver" % "4.2.3"
+
+// https://mvnrepository.com/artifact/org.neo4j.driver/neo4j-java-driver
+libraryDependencies += "org.neo4j.driver" % "neo4j-java-driver" % "4.2.5"
+
+// https://mvnrepository.com/artifact/com.dimafeng/neotypes
+libraryDependencies += "com.dimafeng" %% "neotypes" % "0.17.0"
+
