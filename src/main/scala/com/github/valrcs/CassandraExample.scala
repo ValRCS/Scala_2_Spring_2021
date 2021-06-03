@@ -16,7 +16,7 @@ object CassandraExample {
     println(s"Going to connect to $host")
     val sslOptions = loadCaCert(caPath)
     //    var cluster = null
-    var cluster = Cluster.builder.addContactPoint(host).withPort(port).withSSL(sslOptions).withAuthProvider(new PlainTextAuthProvider(username, password)).build
+    val cluster = Cluster.builder.addContactPoint(host).withPort(port).withSSL(sslOptions).withAuthProvider(new PlainTextAuthProvider(username, password)).build
     try {
       //      cluster: Cluster = Cluster.builder.addContactPoint(host).withPort(port).withSSL(sslOptions).withAuthProvider(new PlainTextAuthProvider(username, password)).build
       val session = cluster.connect
