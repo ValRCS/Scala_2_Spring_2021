@@ -33,7 +33,7 @@ object XMLParsing extends App {
   val note502 = notes.filter(el => el.attribute("id").getOrElse("").toString == "502") //TODO how to avoid ToString
   print(note502)
 
-  case class Message(id:Int, to:String,from: String, heading:String, body:String)
+  case class Message(id:Int, to:String,from: String, heading:String, body:String, footer: String, main: String)
 
   def fromXML(node: scala.xml.Node):Message = {
     Message (
@@ -41,14 +41,16 @@ object XMLParsing extends App {
       (node \ "to").text, //if these child elements do not exist, we will just get nothing ""
       (node \ "from").text,
       (node \ "heading").text,
-      (node \ "body").text //if we have multiple children we will get text for all
-      //TODO add parsing for footer
-      //TODO add parsing for main section, note main is inside body!
+      (node \ "body").text, //if we have multiple children we will get text for all
+      (node \ "footer").text,
+      (node \ "body" \ "main").text
     )
   }
   println("\nMy Messages:")
   val messages = notes.map(el => fromXML(el)) //now we have our own internal data structure where we can do whatever we want
   messages.foreach(println)
 
-  //TODO filter those messages with id over 502
+  //filter those messages with id over 502
+  val over502 = messages.filter(msg => msg.id > 502)
+  println(over502)
 }
