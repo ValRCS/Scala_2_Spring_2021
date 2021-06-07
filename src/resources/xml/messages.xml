@@ -1,0 +1,42 @@
+<messages>
+    <note id="501">
+        <to>Tove</to>
+        <from>Jani</from>
+        <heading>Reminder</heading>
+        <body>Don't forget me this weekend!</body>
+    </note>
+    <note id="502">
+        <to>Jani</to>
+        <from>Tove</from>
+        <heading>Re: Reminder</heading>
+        <body>I will not</body>
+    </note>
+    <note>
+        <to>NotJani</to>
+        <from>Tove</from>
+        <heading>Re: Alert</heading>
+        <body>I will not</body>
+    </note>
+    <note id="503">
+        <to>Jani</to>
+        <from>Tove</from>
+        <heading>Re: Reminder</heading>
+        <footer>Just a footer but forgot body</footer>
+    </note>
+    <note id="504">
+        <to>Jani</to>
+        <from>Tove</from>
+        <heading>Re: Reminder</heading>
+        <body>One Body</body>
+        <body>Second body , in say<main>Main paragraph</main> HTML this would not be allowed</body>
+        <footer>Just a footer but forgot body</footer>
+    </note>
+    <note id="505">
+        <to>Jani</to>
+        <from>Tove</from>
+        <heading>Re: Reminder</heading>
+        <body>One Body</body>
+        <body>Second body , <main>Main paragraph as well</main>in say HTML this would not be allowed</body>
+        <footer>Just a footer but forgot body</footer>
+    </note>
+</messages>
