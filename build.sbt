@@ -23,4 +23,6 @@ libraryDependencies += "com.dimafeng" %% "neotypes" % "0.17.0"
 // https://mvnrepository.com/artifact/com.datastax.cassandra/cassandra-driver-core
 libraryDependencies += "com.datastax.cassandra" % "cassandra-driver-core" % "3.11.0"
 
+// https://mvnrepository.com/artifact/org.scala-lang.modules/scala-xml
+libraryDependencies += "org.scala-lang.modules" %% "scala-xml" % "2.0.0"
 
