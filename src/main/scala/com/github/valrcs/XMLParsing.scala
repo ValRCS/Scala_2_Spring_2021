@@ -31,13 +31,16 @@ object XMLParsing extends App {
   println(notes(1)) //not recommended because  you might not have 2 notes!
   notes.foreach(el => println(el.attribute("id"))) //we might not have attribute so we get Some()
   val note502 = notes.filter(el => el.attribute("id").getOrElse("").toString == "502") //TODO how to avoid ToString
-  print(note502)
+  println(note502)
+  println(note502.head \ "@id") //so we can get the id value
+  val n502id = (note502.head \ "@id" ).text //this would be "" if no id attribute nodes are found
 
   case class Message(id:Int, to:String,from: String, heading:String, body:String, footer: String, main: String)
 
   def fromXML(node: scala.xml.Node):Message = {
     Message (
       node.attribute("id").getOrElse("0").toString.toInt, //if we have no id, well then we give "0"
+//      (node \ "@id").text.toInt, //this attribute selector would work if we have this attribute
       (node \ "to").text, //if these child elements do not exist, we will just get nothing ""
       (node \ "from").text,
       (node \ "heading").text,
@@ -53,4 +56,45 @@ object XMLParsing extends App {
   //filter those messages with id over 502
   val over502 = messages.filter(msg => msg.id > 502)
   println(over502)
+
+  val url = "https://dom.lndb.lv/data/obj/656227.xml"
+  val savePath = "./src/resources/xml/aija.xml"
+//  Utilities.saveUrlToFile(url, savePath) //we did it once no need for it again
+
+//  val bookXML = XML.load(url) //this hits LNB server which is fine but no need to do it constantly
+  val bookXML = XML.load(savePath) //no need to hit library servers unless we need a fresh copy
+  val files = bookXML \\ "file" //so we just take file tag
+  println(s"We have information about ${files.length} files in our XML data")
+
+  //File is a very common name but it is under our own package so no collision
+  case class File(id:Int,
+                  versionId: Int,
+                  uri: String,
+                  publicName: String,
+                  internalName: String,
+                  kind: String,
+                  lastSaved: String,
+                  sizeMB: String)
+
+  def fromXMLtoFile(node: scala.xml.Node):File = {
+    val fields = node \ "fileMetadata" \ "field"
+    println(s"We have ${fields.length} fields")
+    fields.foreach(f => println(s"${f.attribute("name")} : ${f.text}"
+))
+    File(
+      id = node.attribute("id").getOrElse("0").toString.toInt,
+      versionId = node.attribute("digitalObjectVersionId").getOrElse("0").toString.toInt,
+      uri = (node \ "uri").text,
+      publicName = node.attribute("name").getOrElse("").toString,
+      internalName = fields.filter(_ \ "@name" exists (_.text == "Name")).text,
+      //FIXME with the above solution
+      //https://stackoverflow.com/questions/7574862/scala-xml-get-nodes-where-parent-has-attribute-value-match/7577990
+      kind = fields.filter(n => n.attribute("name").contains("Kind")).text,
+      lastSaved = fields.filter(n => n.attribute("name").contains("Date last saved")).text,
+      sizeMB = fields.filter(n => n.attribute("name").contains("Size")).text.split(" ")(0)
+    )
+  }
+
+  val fileSeq = files.slice(0,5).map(f => fromXMLtoFile(f))
+  fileSeq.slice(0,5).foreach(println)
 }
