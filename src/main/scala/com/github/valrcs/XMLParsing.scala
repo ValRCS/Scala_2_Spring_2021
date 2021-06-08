@@ -75,14 +75,28 @@ object XMLParsing extends App {
                   fileAccessType: String, //type is already used by Scala
                   kind: String,
                   lastSaved: String,
+                 //data: String,
+                 //time: String,
                   sizeMB: Double)
+  //TODO add data and time and extract it
+
+
+
+  def parseFileSize(txt: String):Double = {
+    val fileSizeRegex = raw"(\d+,?\d*)".r //we want some digits with optional comma and optional more digits
+    val res = fileSizeRegex.findFirstIn(txt)
+      .getOrElse("0") //so on mismatches we will report file size as zero
+      //        .split(" ")(0)
+      .replace(',', '.')
+      .toDouble
+    //for more complex matches we would probably want pattern matching here we have KB or MB(default)
+    if (txt.contains("KB")) res/1000 else res
+  }
 
   def fromXMLtoFile(node: scala.xml.Node):File = {
     val fields = node \ "fileMetadata" \ "field"
 //    println(s"We have ${fields.length} fields")
 //    fields.foreach(f => println(s"${f.attribute("name")} : ${f.text}"))
-    val fileSizeRegex = raw"(\d+,?\d*)".r //we want some digits with optional comma and optional more digits
-
     File(
       id = node.attribute("id").getOrElse("0").toString.toInt,
       versionId = node.attribute("digitalObjectVersionId").getOrElse("0").toString.toInt,
@@ -90,16 +104,12 @@ object XMLParsing extends App {
       publicName = node.attribute("name").getOrElse("").toString,
       internalName = fields.filter(_ \ "@name" exists (_.text == "Name")).text,
       //https://stackoverflow.com/questions/7574862/scala-xml-get-nodes-where-parent-has-attribute-value-match/7577990
-//      kind = fields.filter(n => n.attribute("name").contains("Kind")).text,
       fileAccessType = node.attribute("type").getOrElse("").toString,
       kind = fields.filter(n => n \ "@name" exists (_.text == "Type")).text,
       lastSaved = fields.filter( _ \ "@name" exists (_.text == "Date last saved")).text,
-//      sizeMB = fields.filter(_ \ "@name" exists (_.text == "Size")).text
-      sizeMB = fileSizeRegex.findFirstIn(fields.filter(_ \ "@name" exists (_.text == "Size")).text)
-        .getOrElse("0") //so on mismatches we will report file size as zero
-//        .split(" ")(0)
-        .replace(',', '.')
-        .toDouble
+
+      //TODO get date and time separately
+      sizeMB = parseFileSize(fields.filter(_ \ "@name" exists (_.text == "Size")).text)
     )
   }
 
@@ -110,6 +120,10 @@ object XMLParsing extends App {
   //print only those files which have uri field of something
   fileSeq.filter(_.uri.nonEmpty).foreach(println)
 
-  //TODO get me files over 10 MB in size
+  //TODO get me files over 5.5 MB in size
+  fileSeq.filter(_.sizeMB > 5.5).foreach(println)
+
+  //https://stackoverflow.com/questions/15259250/in-scala-how-to-get-a-slice-of-a-list-from-nth-element-to-the-end-of-the-list-w/15259268
+  fileSeq.takeRight(4).foreach(println)
 
 }
