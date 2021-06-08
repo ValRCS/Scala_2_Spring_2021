@@ -1,5 +1,7 @@
 package com.github.valrcs
 
+import upickle.legacy.macroRW
+
 import scala.xml.XML
 
 object XMLParsing extends App {
@@ -79,9 +81,12 @@ object XMLParsing extends App {
                   date: String,
                   time: String,
                   sizeMB: Double)
-  //TODO add data and time and extract it
 
-
+  //REQUIRED in order to write File case class directly to JSON
+  //https://www.lihaoyi.com/post/HowtoworkwithJSONinScala.html
+  //unclear if start of fileRW has to match case class name
+implicit val fileRW = upickle.default.macroRW[File]
+  //if you want to write other custom classes you have to do the same thing
 
   def parseFileSize(txt: String):Double = {
     val fileSizeRegex = raw"(\d+,?\d*)".r //we want some digits with optional comma and optional more digits
@@ -144,4 +149,13 @@ object XMLParsing extends App {
   //https://stackoverflow.com/questions/15259250/in-scala-how-to-get-a-slice-of-a-list-from-nth-element-to-the-end-of-the-list-w/15259268
   fileSeq.takeRight(4).foreach(println)
 
+//  val topString = ujson.write(Seq("doh",1,3424,3.1466),  indent = 4)
+//  val jsonString = ujson.write((List("Hello", "World")), indent = 4)
+//  println(jsonString)
+  val singleJson = upickle.default.write(fileSeq(0), indent = 4)
+  println(singleJson)
+  val filesJson = upickle.default.write(fileSeq, indent = 4)
+
+  val saveJsonPath = "./src/resources/json/aija.json"
+  Utilities.saveString(filesJson, saveJsonPath)
 }
