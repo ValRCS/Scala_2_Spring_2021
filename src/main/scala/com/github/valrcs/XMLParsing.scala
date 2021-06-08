@@ -2,6 +2,10 @@ package com.github.valrcs
 
 import upickle.legacy.macroRW
 
+import kantan.csv._
+import kantan.csv.ops._
+import kantan.csv.generic._
+
 import scala.xml.XML
 
 object XMLParsing extends App {
@@ -70,22 +74,22 @@ object XMLParsing extends App {
   println(s"We have information about ${files.length} files in our XML data")
 
   //File is a very common name but it is under our own package so no collision
-  case class File(id:Int,
-                  versionId: Int,
-                  uri: String,
-                  publicName: String,
-                  internalName: String,
-                  fileAccessType: String, //type is already used by Scala
-                  kind: String,
-                  lastSaved: String,
-                  date: String,
-                  time: String,
-                  sizeMB: Double)
+  case class MyFile(id:Int,
+                    versionId: Int,
+                    uri: String,
+                    publicName: String,
+                    internalName: String,
+                    fileAccessType: String, //type is already used by Scala
+                    kind: String,
+                    lastSaved: String,
+                    date: String,
+                    time: String,
+                    sizeMB: Double)
 
   //REQUIRED in order to write File case class directly to JSON
   //https://www.lihaoyi.com/post/HowtoworkwithJSONinScala.html
   //unclear if start of fileRW has to match case class name
-implicit val fileRW = upickle.default.macroRW[File]
+implicit val fileRW = upickle.default.macroRW[MyFile]
   //if you want to write other custom classes you have to do the same thing
 
   def parseFileSize(txt: String):Double = {
@@ -114,12 +118,12 @@ implicit val fileRW = upickle.default.macroRW[File]
     time
   }
 
-  def fromXMLtoFile(node: scala.xml.Node):File = {
+  def fromXMLtoFile(node: scala.xml.Node):MyFile = {
     val fields = node \ "fileMetadata" \ "field"
     val lastSavedText = fields.filter( _ \ "@name" exists (_.text == "Date last saved")).text //if we call it 3 times it might be more efficient
 //    println(s"We have ${fields.length} fields")
 //    fields.foreach(f => println(s"${f.attribute("name")} : ${f.text}"))
-    File(
+    MyFile(
       id = node.attribute("id").getOrElse("0").toString.toInt,
       versionId = node.attribute("digitalObjectVersionId").getOrElse("0").toString.toInt,
       uri = (node \ "uri").text,
@@ -158,4 +162,23 @@ implicit val fileRW = upickle.default.macroRW[File]
 
   val saveJsonPath = "./src/resources/json/aija.json"
   Utilities.saveString(filesJson, saveJsonPath)
+
+  // File in which we'll be writing the CSV data.
+//  val out = java.io.File.createTempFile("./src/resources/csv/files.csv", "csv")
+//  val fileEncoder: RowEncoder[MyFile] = RowEncoder.caseEncoder(0, 1, 2,3,4,5,6,7,8,9,10)(MyFile.unapply)
+//  val writer = out.asCsvWriter[File](rfc.withHeader("id",
+//    "versionId",
+//    "uri",
+//    "publicName",
+//    "internalName",
+//    "fileAccessType",
+//    "kind",
+//    "lastSaved",
+//    "date",
+//    "time",
+//    "sizeMB"
+//
+//  ))
+//  out.writeCsv(fileSeq).close() //FIXME see what is missing to write a collection of MyFile
+
 }
