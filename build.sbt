@@ -26,3 +26,7 @@ libraryDependencies += "com.datastax.cassandra" % "cassandra-driver-core" % "3.1
 // https://mvnrepository.com/artifact/org.scala-lang.modules/scala-xml
 libraryDependencies += "org.scala-lang.modules" %% "scala-xml" % "2.0.0"
 
+// https://mvnrepository.com/artifact/com.lihaoyi/upickle
+libraryDependencies += "com.lihaoyi" %% "upickle" % "1.3.15"
+
+
