@@ -63,7 +63,8 @@ object XMLParsing extends App {
 
 //  val bookXML = XML.load(url) //this hits LNB server which is fine but no need to do it constantly
   val bookXML = XML.load(savePath) //no need to hit library servers unless we need a fresh copy
-  val files = bookXML \\ "file" //so we just take file tag
+//  val files = bookXML \\ "file" //so we just take all file tags no matter how deep works but a bit loose
+  val files = bookXML \ "files" \  "file" //this is more specific than the above
   println(s"We have information about ${files.length} files in our XML data")
 
   //File is a very common name but it is under our own package so no collision
@@ -75,8 +76,8 @@ object XMLParsing extends App {
                   fileAccessType: String, //type is already used by Scala
                   kind: String,
                   lastSaved: String,
-                 //data: String,
-                 //time: String,
+                  date: String,
+                  time: String,
                   sizeMB: Double)
   //TODO add data and time and extract it
 
@@ -93,8 +94,24 @@ object XMLParsing extends App {
     if (txt.contains("KB")) res/1000 else res
   }
 
+  def parseToDate(txt: String):String = {
+    val fileDateRegex = raw"(\d{2}\.\d{2}\.\d{4})".r //. represent any single character so we want to escape them if we want . specifically
+    val date = fileDateRegex.findFirstIn(txt)
+      .getOrElse("0")
+    date
+  }
+
+
+  def parseToTime(txt: String):String = {
+    val fileTimeRegex = raw"(\d{2}:\d{2}:\d{2})".r
+    val time = fileTimeRegex.findFirstIn(txt)
+      .getOrElse("0")
+    time
+  }
+
   def fromXMLtoFile(node: scala.xml.Node):File = {
     val fields = node \ "fileMetadata" \ "field"
+    val lastSavedText = fields.filter( _ \ "@name" exists (_.text == "Date last saved")).text //if we call it 3 times it might be more efficient
 //    println(s"We have ${fields.length} fields")
 //    fields.foreach(f => println(s"${f.attribute("name")} : ${f.text}"))
     File(
@@ -106,8 +123,9 @@ object XMLParsing extends App {
       //https://stackoverflow.com/questions/7574862/scala-xml-get-nodes-where-parent-has-attribute-value-match/7577990
       fileAccessType = node.attribute("type").getOrElse("").toString,
       kind = fields.filter(n => n \ "@name" exists (_.text == "Type")).text,
-      lastSaved = fields.filter( _ \ "@name" exists (_.text == "Date last saved")).text,
-
+      lastSaved = lastSavedText,
+      date = parseToDate(lastSavedText),
+      time = parseToTime(lastSavedText),
       //TODO get date and time separately
       sizeMB = parseFileSize(fields.filter(_ \ "@name" exists (_.text == "Size")).text)
     )
