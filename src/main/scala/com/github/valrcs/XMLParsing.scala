@@ -74,13 +74,14 @@ object XMLParsing extends App {
                   internalName: String,
                   kind: String,
                   lastSaved: String,
-                  sizeMB: String)
+                  sizeMB: Double)
 
   def fromXMLtoFile(node: scala.xml.Node):File = {
     val fields = node \ "fileMetadata" \ "field"
     println(s"We have ${fields.length} fields")
-    fields.foreach(f => println(s"${f.attribute("name")} : ${f.text}"
-))
+    fields.foreach(f => println(s"${f.attribute("name")} : ${f.text}"))
+    val fileSizeRegex = raw"(\d+,?\d*)".r //we want some digits with optional comma and optional more digits
+
     File(
       id = node.attribute("id").getOrElse("0").toString.toInt,
       versionId = node.attribute("digitalObjectVersionId").getOrElse("0").toString.toInt,
@@ -89,9 +90,15 @@ object XMLParsing extends App {
       internalName = fields.filter(_ \ "@name" exists (_.text == "Name")).text,
       //FIXME with the above solution
       //https://stackoverflow.com/questions/7574862/scala-xml-get-nodes-where-parent-has-attribute-value-match/7577990
-      kind = fields.filter(n => n.attribute("name").contains("Kind")).text,
-      lastSaved = fields.filter(n => n.attribute("name").contains("Date last saved")).text,
-      sizeMB = fields.filter(n => n.attribute("name").contains("Size")).text.split(" ")(0)
+//      kind = fields.filter(n => n.attribute("name").contains("Kind")).text,
+      kind = fields.filter(n => n \ "@name" exists (_.text == "Type")).text,
+      lastSaved = fields.filter( _ \ "@name" exists (_.text == "Date last saved")).text,
+//      sizeMB = fields.filter(_ \ "@name" exists (_.text == "Size")).text
+      sizeMB = fileSizeRegex.findFirstIn(fields.filter(_ \ "@name" exists (_.text == "Size")).text)
+        .getOrElse("0")
+//        .split(" ")(0)
+        .replace(',', '.')
+        .toDouble
     )
   }
 
